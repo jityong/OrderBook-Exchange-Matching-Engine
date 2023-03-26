@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Assignment 2: Exchange matching engine in Go</title>
+  <style>
+    :root{--b-font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;--b-font-mono: Consolas, Monaco, monospace;--b-txt: #2e3440;--b-bg-1: #fff;--b-bg-2: #eceff4;--b-line: #eceff4;--b-link: #bf616a;--b-btn-bg: #242933;--b-btn-txt: #fff;--b-focus: #88c0d0}*,::before,::after{box-sizing:border-box}html:focus-within{scroll-behavior:smooth}body{max-width:70ch;padding:0 1rem;margin:auto;background:var(--b-bg-1);font-family:var(--b-font-main);text-rendering:optimizeSpeed;line-height:1.5;color:var(--b-txt);-moz-tab-size:4;tab-size:4;word-break:break-word;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}h1,h2,h3,h4,h5,h6,p,ul,ol,dl,dd,details,blockquote,pre,figure,table,address,hr,fieldset,iframe,audio,video{margin:0 0 1.5rem}h1,h2,h3,h4,h5,h6{line-height:1.25;margin-top:2rem}h1{font-size:2rem}h2{font-size:1.5rem}h3{font-size:1.25rem}h4{font-size:1rem}h5{font-size:.875rem}h6{font-size:.75rem}a{color:var(--b-link);text-decoration:none}a:hover{text-decoration:underline}img,video,svg{max-width:100%;height:auto}embed,iframe,object{max-width:100%}iframe{border-style:none}abbr[title]{text-decoration:underline;text-decoration:underline dotted}blockquote{margin-left:0;padding:.5rem 0 .5rem 1.5rem;border-left:.25rem solid var(--b-txt)}blockquote>:last-child{margin-bottom:0}small{font-size:.875rem}sub,sup{font-size:.75em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}hr{height:0;overflow:visible;border:0;border-bottom:1px solid var(--b-line)}pre,code,kbd,samp,tt,var{background:var(--b-bg-2);border-radius:.25rem;padding:.125rem .25rem;font-family:var(--b-font-mono);font-size:.875rem}pre{padding:1rem;border-radius:0;overflow:auto;white-space:pre}pre code{padding:0}details{display:block;padding:.5rem 1rem;background:var(--b-bg-2);border:1px solid var(--b-line);border-radius:.25rem}details>:last-child{margin-bottom:0}details[open]>summary{margin-bottom:1.5rem}summary{display:list-item;cursor:pointer;font-weight:bold}summary:focus{box-shadow:none}table{border-collapse:collapse;width:100%;text-indent:0}table caption{margin-bottom:.5rem}tr{border-bottom:1px solid var(--b-line)}td,th{padding:.5rem 0}th{text-align:left}ul,ol,dd{padding-left:2rem}li>ul,li>ol{margin-bottom:0}fieldset{padding:.5rem .75rem;border:1px solid var(--b-line);border-radius:.25rem}legend{padding:0 .25rem}label{cursor:pointer;display:block;margin-bottom:.25rem}button,input,select,textarea{margin:0;padding:.5rem .75rem;max-width:100%;background:var(--b-bg-2);border:0;border-radius:.25rem;font:inherit;line-height:1.125;color:var(--b-txt)}select,input:not([size]):not([type=button i]):not([type=submit i]):not([type=reset i]):not([type=checkbox i]):not([type=radio i]){width:100%}[type=color i]{min-height:2.125rem}select:not([multiple]):not([size]){padding-right:1.5rem;background-repeat:no-repeat;background-position:right .5rem center;-moz-appearance:none;-webkit-appearance:none;appearance:none}textarea{width:100%;resize:vertical}textarea:not([rows]){height:8rem}button,[type=button i],[type=submit i],[type=reset i]{-webkit-appearance:button;display:inline-block;text-align:center;white-space:nowrap;background:var(--b-btn-bg);color:var(--b-btn-txt);border:0;cursor:pointer;transition:opacity .25s}button:hover,[type=button i]:hover,[type=submit i]:hover,[type=reset i]:hover{opacity:.75}button[disabled],[type=button i][disabled],[type=submit i][disabled],[type=reset i][disabled]{opacity:.5}progress{vertical-align:middle}[type=search i]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}::-webkit-input-placeholder{color:inherit;opacity:.5}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}::-moz-focus-inner{border-style:none;padding:0}:-moz-focusring{outline:1px dotted ButtonText}:-moz-ui-invalid{box-shadow:none}[aria-busy=true i]{cursor:progress}[aria-controls]{cursor:pointer}[aria-disabled=true i],[disabled]{cursor:not-allowed}:focus,details:focus-within{outline:none;box-shadow:0 0 0 2px var(--b-focus)}@media(prefers-reduced-motion: reduce){html:focus-within{scroll-behavior:auto}*,::before,::after{animation-delay:-1ms !important;animation-duration:1ms !important;animation-iteration-count:1 !important;background-attachment:initial !important;scroll-behavior:auto !important;transition-delay:0 !important;transition-duration:0 !important}}select:not([multiple]):not([size]){background-image:url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%232e3440'%3E%3Cpath d='M5 6l5 5 5-5 2 1-7 7-7-7 2-1z'/%3E%3C/svg%3E")}
+    body {
+      /* bamboo is too thin */
+      max-width: 80ch;
+    }
+    /* Add styling for captions, mainly to go under code blocks */
+    figcaption {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.header-section-number {
+      margin-right: 0.5em;
+    }
+    span.toc-section-number {
+      margin-right: 0.3em;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Assignment 2: Exchange matching engine in Go</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#clarifications-on-the-functionality-of-the-matching-engine"><span class="toc-section-number">1</span> Clarifications on the functionality
+of the matching engine</a>
+<ul>
+<li><a href="#price-time-priority"><span class="toc-section-number">1.1</span> Price-time priority</a></li>
+<li><a href="#cancel-requests"><span class="toc-section-number">1.2</span> Cancel requests</a></li>
+<li><a href="#processing-order-and-arrival-order"><span class="toc-section-number">1.3</span> Processing order and arrival
+order</a></li>
+</ul></li>
+<li><a href="#requirements"><span class="toc-section-number">2</span>
+Requirements</a>
+<ul>
+<li><a href="#provided-skeleton"><span class="toc-section-number">2.1</span> Provided skeleton</a></li>
+<li><a href="#submission"><span class="toc-section-number">2.2</span>
+Submission</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>In this assignment, you will implement an exchange matching engine in
+Go, using channels and goroutines. The functionality of the matching
+engine is the same as the one presented in CS3211 Assignment 1, with
+minor clarifications.</p>
+<h1 data-number="1" id="clarifications-on-the-functionality-of-the-matching-engine"><span class="header-section-number">1</span> Clarifications on the
+functionality of the matching engine</h1>
+<p>Start by reading again the functionality of the matching engine
+described in Assignment 1 writeup.</p>
+<h2 data-number="1.1" id="price-time-priority"><span class="header-section-number">1.1</span> Price-time priority</h2>
+<p>Your exchange should match orders using the <em>price-time</em>
+priority rule. This rule for matching two orders on an exchange is
+expressed using the following conditions – which must all be true for
+the matching to happen:</p>
+<ul>
+<li>The <em>side</em> of the two orders must be different (i.e. a buy
+order must match against a sell order or vice versa).</li>
+<li>The <em>instrument</em> of the two orders must be the same (i.e. an
+order for “GOOG” must match against another order for “GOOG”).</li>
+<li>The <em>size</em> of the two orders must be greater than zero.</li>
+<li>The <em>price</em> of the buy order must be <em>greater or
+equal</em> to the price of the sell order.</li>
+<li>In case multiple orders can be matched, the order with the earliest
+completion time (<code>Timestamp completed</code> from the output
+generated by adding resting order) will be matched first. This is to
+ensure fairness towards the orders that have waited the longest.</li>
+<li>New buy orders spend the least amount of money, while new sell
+orders obtain the most amount of money.</li>
+</ul>
+<p>Orders can be partially matched in case the size of the other order
+is lower. Consequently, orders can be matched multiple times.</p>
+<details>
+<summary>
+Example 4: Price-time priority
+</summary>
+<pre><code>Input                 Output
+# Sell GOOG x 10 @ 2701
+S 123 GOOG 2701 10
+                      S 123 GOOG 2701 10
+# Sell GOOG x 25 @ 2700
+S 124 GOOG 2700 25
+                      S 124 GOOG 2700 25
+# Buy GOOG x 30 @ 2705
+B 125 GOOG 2705 30
+# S 124 has the best price (2700) and partially matches B 125 
+(even though it arrived at the matching engine after S 123)
+                      E 124 125 1 2700 25
+# Then S 123 will be partially matched with 5 counts on the 
+selling price 2701.
+                      E 123 125 1 2701 5</code></pre>
+</details>
+<h2 data-number="1.2" id="cancel-requests"><span class="header-section-number">1.2</span> Cancel requests</h2>
+<p>A Cancel request for a specific order ID may come only from the
+client that sent that order ID. Cancel requests for a non-existing order
+ID may come from any client.</p>
+<h2 data-number="1.3" id="processing-order-and-arrival-order"><span class="header-section-number">1.3</span> Processing order and arrival
+order</h2>
+<p>The orders are received from multiple clients at the matching engine
+in some order (arrival order). The order is considered
+<code>active</code> between the time it is received and the time when
+its processing ends (and it is added to the order book or executed). The
+output timestamps prints (<code>Timestamp completed</code>) should
+reflect the processing order.</p>
+<p>Due to concurrent processing, the order in which the requests arrive
+at the engine and the requests are processed might not match. When two
+orders are active at the same time, any of them might be processed first
+and their partial matching can be interleaved.</p>
+<p>There might be cases where matching sell and buy orders are active at
+the same time, while none of the resting orders are matching with those
+active orders. The expected behavior is for one (any) of the active
+orders to be added to the book first (it has a smaller
+<code>Timestamp completed</code> in the output), and the other one to
+match it.</p>
+<p>There might be cases where cancel requests for an order ID and the
+order ID are active at the same time. In that case, any of the following
+actions is acceptable in handling the Cancel request:</p>
+<ul>
+<li>rejected if the Cancel is processed before the order gets added to
+the book (cancel has a smaller <code>Timestamp completed</code> in the
+output); in this case, the cancel does not affect the buy order in any
+way. Note that cancel orders are not added to the order book, and they
+are rejected if they cancel an invalid order id.</li>
+<li>accepted if the Cancel is processed AFTER the buy order gets added
+to the book.</li>
+</ul>
+<p>When checking correctness for your matching engine, ensure that
+output lines sorted by <code>Timestamp completed</code> corresponds to a
+valid interleaving of the matching for the provided inputs.</p>
+<h1 data-number="2" id="requirements"><span class="header-section-number">2</span> Requirements</h1>
+<p>Unlike Assignment 1 where any synchronization primitive and the usage
+of lock-free programming was allowed, Assignment 2 has a strict
+requirement on what type of constructs you are allowed to use:</p>
+<ul>
+<li><strong>You must implement the assignment only using goroutines,
+channels, and channel peripherals like
+<code>select</code>.</strong></li>
+<li><strong>You should have at least one goroutine per client AND at
+least one goroutine per instrument in the order book.</strong></li>
+<li>You are not allowed to use any utilities from <code>sync</code>
+package in Go (mutex, condition variable, pools are not allowed)</li>
+<li>You are not be allowed to use any shared data structure other than
+channels (buffered or unbuffered)</li>
+</ul>
+<p>Same as in Assignment 1, you are required to implement in Go the
+concurrent matching in the matching engine.</p>
+<h2 data-number="2.1" id="provided-skeleton"><span class="header-section-number">2.1</span> Provided skeleton</h2>
+<p>The following files are provided.</p>
+<p>Files you will likely need to modify only:</p>
+<ul>
+<li><code>engine.go</code>: An empty <code>engine</code> implementation
+that creates a new goroutine when a connection is received, and then
+simply read commands and dumps them to standard output. You will likely
+need to modify <code>handleConn</code>.</li>
+</ul>
+<p>Files you should not need to modify:</p>
+<ul>
+<li><code>main.go</code>: Main function.</li>
+<li><code>io.h</code>: Shared declarations for I/O</li>
+<li><code>client.c</code>: Same as assignment 1</li>
+<li><code>Makefile</code>: Same as assignment 1, except all
+<code>*.go</code> files should be compiled when running
+<code>make engine</code></li>
+</ul>
+<p>You can modify the <code>Makefile</code> to exclude some Go files
+from compilation if needed.</p>
+<h2 data-number="2.2" id="submission"><span class="header-section-number">2.2</span> Submission</h2>
+<p>Your program must be written in Go 1.17. You have to rely on the Go
+standard library for this task. Any <code>go.mod</code> files will be
+ignored.</p>
+<p>Your program must work on the lab machines provided in the Parallel
+Computing Lab at COM1-B1-02, which are running Ubuntu 20.04 (details
+about how to connect and use those computers can be found in the
+assignment 1 writeup).</p>
+<p>With your submission, include a writeup as a PDF of up to two A4
+pages including the following:</p>
+<ul>
+<li>an explanation about how your usage of channels and goroutines
+enables the concurrency. This description is essential for our grading,
+as such, it should match your implementation and help us
+understand.</li>
+<li>an explanation of how you support the concurrent execution of orders
+coming from multiple parallel clients.</li>
+<li>a description of any Go patterns used in your implementation.</li>
+<li>a description of your data structure(s) used to keep track of the
+orders.</li>
+<li>a description of how you tested your code with multiple clients and
+orders. Feel free to add any scripts or test case file(s) to your
+submission, under folder <code>scripts</code></li>
+</ul>
+<p>You are advised to work in groups of two students for this assignment
+(but you are allowed to work independently as well). You may discuss the
+assignment with others but in the case of plagiarism, both parties will
+be severely penalized. Cite your references or at least mention them in
+your report (what you referenced, where it came from, how much you
+referenced, etc.).</p>
+<p>Submit your assignment before the deadline under LumiNUS Files. Each
+group must submit ONE zip archive named with your student number(s)
+(<code>A0123456Z.zip</code> if you worked by yourself, or
+<code>A0123456Z_A0173456T.zip</code> if you worked with another student)
+containing the following files and folders.</p>
+<p>Your zip archive must contain <strong>only</strong> the
+following:</p>
+<ul>
+<li>all source and header files that comprise your program
+<ul>
+<li>Please include files from the skeleton that are required by your
+program, even if you do not modify them.</li>
+</ul></li>
+<li>a <code>Makefile</code> whose default target produces an
+<code>engine</code> binary conforming to the requirements described
+above
+<ul>
+<li>The provided <code>Makefile</code> conforms to this.</li>
+</ul></li>
+<li>the 2-page writeup as a PDF named <code>A0123456Z_report.pdf</code>
+or <code>A0123456Z_A0173456T_report.pdf</code></li>
+<li>an optional folder, named <code>scripts</code>, containing any
+additional scripts and testcases that you might have used for the
+assignment.</li>
+</ul>
+<p><strong>Do not</strong> include compiled binaries or object files in
+your submission archive.</p>
+<p>It is required to use a GitHub repository for your team. Access
+<strong>GitHub Classroom</strong> at this <a href="https://classroom.github.com/a/WGA6atQz">link</a> to create such a
+repository. Name your team <code>A0123456Z</code> (if you work by
+yourself) or <code>A0123456Z_A0173456T</code> (if you work with another
+student).</p>
+<p>Submit your zip archive to the <strong>Assignment 2
+Submissions</strong> folder before <strong>Fri, 25 Mar,
+2pm</strong>.</p>
+<p><strong>All FAQs for this assignment will be answered <a href="https://docs.google.com/document/d/e/2PACX-1vRNTY2NXCxQLf_2LTMpvjx4JdEn1DqufPEPNWc_Ry1bRhyX-024zY3T7K0micWa97sToy4_qM58Aisg/pub">here</a>.
+If there are any questions you have that are not covered by the FAQ
+document, please post on the LumiNUS Forum.</strong></p>
+<p>Note that for submissions made as a group, only the most recent
+submission (from any of the students) will be graded, and both students
+receive that grade.</p>
+<p>A penalty of 5% per day (out of your grade for this assignment) will
+be applied for late submissions.</p>
+</body>
+</html>

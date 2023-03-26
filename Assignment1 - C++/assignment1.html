@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Assignment 1: Exchange matching engine in C++</title>
+  <style>
+    :root{--b-font-main:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;--b-font-mono:Consolas,Monaco,monospace;--b-txt:#2e3440;--b-bg-1:#fff;--b-bg-2:#eceff4;--b-line:#eceff4;--b-link:#bf616a;--b-btn-bg:#242933;--b-btn-txt:#fff;--b-focus:#88c0d0}*,:after,:before{box-sizing:border-box}html:focus-within{scroll-behavior:smooth}body{max-width:70ch;padding:0 1rem;margin:auto;background:var(--b-bg-1);font-family:var(--b-font-main);text-rendering:optimizeSpeed;line-height:1.5;color:var(--b-txt);-moz-tab-size:4;tab-size:4;word-break:break-word;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}address,audio,blockquote,dd,details,dl,fieldset,figure,h1,h2,h3,h4,h5,h6,hr,iframe,ol,p,pre,table,ul,video{margin:0 0 1.5rem}h1,h2,h3,h4,h5,h6{line-height:1.25;margin-top:2rem}h1{font-size:2rem}h2{font-size:1.5rem}h3{font-size:1.25rem}h4{font-size:1rem}h5{font-size:.875rem}h6{font-size:.75rem}a{color:var(--b-link);text-decoration:none}a:hover{text-decoration:underline}img,svg,video{height:auto}embed,iframe,img,object,svg,video{max-width:100%}iframe{border-style:none}abbr[title]{text-decoration:underline;text-decoration:underline dotted}blockquote{margin-left:0;padding:.5rem 0 .5rem 1.5rem;border-left:.25rem solid var(--b-txt)}blockquote>:last-child{margin-bottom:0}small{font-size:.875rem}sub,sup{font-size:.75em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}hr{height:0;overflow:visible;border:0;border-bottom:1px solid var(--b-line)}code,kbd,pre,samp,tt,var{background:var(--b-bg-2);border-radius:.25rem;padding:.125rem .25rem;font-family:var(--b-font-mono);font-size:.875rem}pre{padding:1rem;border-radius:0;overflow:auto;white-space:pre}pre code{padding:0}details{display:block;padding:.5rem 1rem;background:var(--b-bg-2);border:1px solid var(--b-line);border-radius:.25rem}details>:last-child{margin-bottom:0}details[open]>summary{margin-bottom:1.5rem}summary{display:list-item;cursor:pointer;font-weight:700}summary:focus{box-shadow:none}table{border-collapse:collapse;width:100%;text-indent:0}table caption{margin-bottom:.5rem}tr{border-bottom:1px solid var(--b-line)}td,th{padding:.5rem 0}th{text-align:left}dd,ol,ul{padding-left:2rem}li>ol,li>ul{margin-bottom:0}fieldset{padding:.5rem .75rem;border:1px solid var(--b-line);border-radius:.25rem}legend{padding:0 .25rem}button,input,select,textarea{margin:0;padding:.5rem .75rem;max-width:100%;background:var(--b-bg-2);border:0;border-radius:.25rem;font:inherit;line-height:1.125;color:var(--b-txt)}input:not([size]):not([type=button i]):not([type=submit i]):not([type=reset i]):not([type=checkbox i]):not([type=radio i]),select{width:100%}[type=color i]{min-height:2.125rem}select:not([multiple]):not([size]){padding-right:1.5rem;background-repeat:no-repeat;background-position:right .5rem center;-moz-appearance:none;-webkit-appearance:none;appearance:none}textarea{width:100%;resize:vertical}textarea:not([rows]){height:8rem}[type=button i],[type=reset i],[type=submit i],button{-webkit-appearance:button;display:inline-block;text-align:center;white-space:nowrap;background:var(--b-btn-bg);color:var(--b-btn-txt);border:0;cursor:pointer;transition:opacity .25s}[type=button i]:hover,[type=reset i]:hover,[type=submit i]:hover,button:hover{opacity:.75}[type=button i][disabled],[type=reset i][disabled],[type=submit i][disabled],button[disabled]{opacity:.5}progress{vertical-align:middle}[type=search i]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}::-webkit-input-placeholder{color:inherit;opacity:.5}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}::-moz-focus-inner{border-style:none;padding:0}:-moz-focusring{outline:1px dotted ButtonText}:-moz-ui-invalid{box-shadow:none}[aria-busy=true i]{cursor:progress}[aria-controls]{cursor:pointer}[aria-disabled=true i],[disabled]{cursor:not-allowed}:focus,details:focus-within{outline:none;box-shadow:0 0 0 2px var(--b-focus)}@media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}*,:after,:before{animation-delay:-1ms!important;animation-duration:1ms!important;animation-iteration-count:1!important;background-attachment:scroll!important;scroll-behavior:auto!important;transition-delay:0!important;transition-duration:0!important}}select:not([multiple]):not([size]){background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%232e3440'%3E%3Cpath d='M5 6l5 5 5-5 2 1-7 7-7-7 2-1z'/%3E%3C/svg%3E")}
+    body {
+      /* bamboo is too thin */
+      max-width: 80ch;
+    }
+    /* Add styling for captions, mainly to go under code blocks */
+    figcaption {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.header-section-number {
+      margin-right: 0.5em;
+    }
+    span.toc-section-number {
+      margin-right: 0.3em;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {  background-color: #eceff4; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ef2929; } /* Alert */
+    code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #c4a000; } /* Attribute */
+    code span.bn { color: #0000cf; } /* BaseN */
+    code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4e9a06; } /* Char */
+    code span.cn { color: #000000; } /* Constant */
+    code span.co { color: #8f5902; font-style: italic; } /* Comment */
+    code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+    code span.dt { color: #204a87; } /* DataType */
+    code span.dv { color: #0000cf; } /* DecVal */
+    code span.er { color: #a40000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #0000cf; } /* Float */
+    code span.fu { color: #000000; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+    code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+    code span.ot { color: #8f5902; } /* Other */
+    code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+    code span.sc { color: #000000; } /* SpecialChar */
+    code span.ss { color: #4e9a06; } /* SpecialString */
+    code span.st { color: #4e9a06; } /* String */
+    code span.va { color: #000000; } /* Variable */
+    code span.vs { color: #4e9a06; } /* VerbatimString */
+    code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+    code {
+      border-radius: 5px;
+      /* scale font size wrt current font size so it renders nicely inline */
+      /* font-size: .875rem; */
+      font-size: .875em;
+      /* Adjust for code blocks in headings, which have different font size */
+      /* padding: .125rem .25rem */
+      padding: calc(.6em - .4rem) .285em .14em .285em;
+    }
+    pre {
+      border-radius: 5px;
+      /* ensure font size is inherited by inner code block */
+      font-size: inherit;
+    }
+    div.sourceCode {
+      border-radius: 5px;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Assignment 1: Exchange matching engine in C++</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#matching-engine"><span class="toc-section-number">1</span>
+Matching engine</a>
+<ul>
+<li><a href="#functionality"><span class="toc-section-number">1.1</span>
+Functionality</a></li>
+<li><a href="#requirements"><span class="toc-section-number">1.2</span>
+Requirements</a></li>
+<li><a href="#provided-skeleton"><span class="toc-section-number">1.3</span> Provided skeleton</a>
+<ul>
+<li><a href="#provided-client"><span class="toc-section-number">1.3.1</span> Provided client</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#submission"><span class="toc-section-number">2</span>
+Submission</a></li>
+<li><a href="#appendix"><span class="toc-section-number">3</span>
+Appendix</a>
+<ul>
+<li><a href="#accessing-the-lab-machines"><span class="toc-section-number">3.1</span> Accessing the lab
+machines</a></li>
+<li><a href="#list-of-machines"><span class="toc-section-number">3.2</span> List of machines</a></li>
+<li><a href="#github-classroom"><span class="toc-section-number">3.3</span> GitHub Classroom</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>In this assignment, you will implement an exchange matching engine,
+using various concurrency mechanisms, in C++.</p>
+<h1 data-number="1" id="matching-engine"><span class="header-section-number">1</span> Matching engine</h1>
+<p>A matching engine is a component that allows the matching of buy and
+sell orders inside an exchange. When an exchange receives a new order,
+it will first try to match this order against existing orders, and, in
+case it cannot match it, will store it in an order book, so that it can
+potentially match it later. If an order is added to the book, we call
+that order ‘resting’.</p>
+<p>Your exchange will match orders using the <em>price-time</em>
+priority rule. This rule for matching two orders on an exchange is
+expressed using the following conditions – which must all be true for
+the matching to happen:</p>
+<ul>
+<li>The <em>side</em> of the two orders must be different (i.e. a buy
+order must match against a sell orders or vice versa)</li>
+<li>The <em>instrument</em> of the two orders must be the same (i.e. an
+order for “GOOG” must match against another order for “GOOG”)</li>
+<li>The <em>size</em> of the two orders must be greater than zero</li>
+<li>The <em>price</em> of the buy order must be <em>greater or
+equal</em> to the price of the sell order</li>
+<li>In case multiple orders can be matched, the order with the earliest
+arrival time will be matched first. This is to ensure fairness towards
+the orders that have waited the longest.</li>
+</ul>
+<p>Orders can be partially matched in case the size of the other order
+is lower. Consequently, orders can be matched multiple times.</p>
+<h2 data-number="1.1" id="functionality"><span class="header-section-number">1.1</span> Functionality</h2>
+<p>In the commands below, the following terms are used:</p>
+<ul>
+<li>Order ID: a unique ID across all orders</li>
+<li>Instrument: the instrument i.e. symbol of the order, up to 8
+characters</li>
+<li>Price: the price of the order</li>
+<li>Count: the size of the order</li>
+</ul>
+<p>Your engine should handle these input commands:</p>
+<ul>
+<li>New buy or sell order
+<ul>
+<li>Arguments: Order ID, Instrument, Price, Count (Size)</li>
+</ul></li>
+<li>Cancel order
+<ul>
+<li>Arguments: Order ID</li>
+</ul></li>
+</ul>
+<p>In response to input commands, the following output actions can be
+done:</p>
+<ul>
+<li>Order added to order book
+<ul>
+<li>Arguments: Order ID, Instrument, Price, Count (Size), Side (buy or
+sell), Timestamp when the Order ID is received, Timestamp when the
+action is completed.</li>
+</ul></li>
+<li>Order executed
+<ul>
+<li>Arguments: Resting order ID, New order ID, Order execution ID,
+Price, Count (Size), Timestamp when the New order ID is received,
+Timestamp when the action is completed</li>
+<li>Order execution ID should be an ID starting from 1, incrementing
+serially each time a particular resting order is matched.
+<ul>
+<li>e.g. if there is a resting order with ID 123, and it is matched
+three times, then there should be executions with (Resting order ID,
+Order execution ID) (123, 1), (123, 2), and (123, 3).</li>
+</ul></li>
+</ul></li>
+<li>Order deleted
+<ul>
+<li>Arguments: Order ID, Cancel state, Timestamp when the cancel request
+is received, Timestamp when the action is completed</li>
+<li>Cancel state is either Accepted (A), if the order is deleted, or
+Rejected (R), if the order was already deleted or fully filled</li>
+</ul></li>
+</ul>
+<p>When a new order is created, the engine should first try to match it
+against one or more existing (resting) orders. When that happens, the
+exchange matching engine should first write the execution message for
+those matches, and then followed by the messages for any new entries
+added to the order book, if the new order is not fully filled.</p>
+<p>Examples below are given in the input format of the provided client
+program, and the output format as required (both described below),
+except that the timestamps required in the output are omitted for
+clarity.</p>
+<details>
+<summary>
+Example 1: New order fully matches against two resting orders
+</summary>
+<pre><code>Input                  Output
+# Sell GOOG x 10 @ 2700
+S 123 GOOG 2700 10
+                       S 123 GOOG 2700 10
+# Sell GOOG x 25 @ 2701
+S 124 GOOG 2701 25
+                       S 124 GOOG 2701 25
+# Buy GOOG x 30 @ 2705
+B 125 GOOG 2705 30
+# Order 123 is matched with 125, partially filling 125 and fully filling 123
+                      E 123 125 1 2700 10
+# Order 124 is matched with 125, fully filling 125 and partially filling 124
+                      E 124 125 1 2701 20</code></pre>
+</details>
+<details>
+<summary>
+Example 2: New order partially matches against two resting orders and
+then is added
+</summary>
+<pre><code>Input                 Output
+# Sell AMZN x 5 @ 3250
+S 201 AMZN 3250 5
+                      S 201 AMZN 3250 5
+# Sell AMZN x 1 @ 3260
+S 202 AMZN 3260 1
+                      S 202 AMZN 3260 1
+# Buy AMZN x 10 @ 3290
+B 203 AMZN 3290 10
+# Order 201 is matched with 203, fully filling 201 and partially filling 203
+                      E 201 203 1 AMZN 3250 5
+# Order 202 is matched with 203, fully filling 202 and partially filling 203
+                      E 202 203 1 AMZN 3260 1
+# The remaining quantity of 4 of order 203 is added to the order book
+                      B 203 AMZN 3290 4</code></pre>
+</details>
+<details>
+<summary>
+Example 3: Orders cancelled
+</summary>
+<pre><code>Input                 Output
+# Buy GOOG x 30 @ 2705
+B 125 GOOG 2705 30
+                      B 125 GOOG 2705 30
+# Sell AMZN x 1 @ 3260
+S 202 AMZN 3260 1
+                      S 202 AMZN 3260 1
+# Cancel 125
+C 125
+# The cancel order is accepted
+                      X 125 A
+# Sell GOOG x 25 @ 2701
+S 124 GOOG 2701 25
+                      S 124 GOOG 2701 25
+# Buy AMZN x 10 @ 3290
+B 203 AMZN 3290 10
+# Order 202 is matched with 203, fully filling 202 and partially filling 203
+                      E 202 203 1 AMZN 3260 1
+# The remaining quantity of 9 of order 203 is added to the order book
+                      B 203 AMZN 3290 9
+# Cancel 202
+C 202
+# Order 202 has been previously matched. As such the cancel order is rejected.
+                      X 202 R</code></pre>
+</details>
+<p>The matching engine receives connections and commands from multiple
+clients at the same time. The commands received from a client must be
+executed (committed) in the order sent by the client (no re-ordering is
+acceptable on the commands sent by a client).</p>
+<h2 data-number="1.2" id="requirements"><span class="header-section-number">1.2</span> Requirements</h2>
+<p>You should design and implement appropriate concurrent data
+structures with appropriate synchronisation mechanisms that will ensure
+the correctness of your matching engine’s results. Aim to write an
+implementation that enables the maximum possible concurrency and
+parallelism e.g. by making locks fine-grained, by using lock-free
+techniques, etc. <strong>The focus of the assignment is on maximising
+concurrency, and not simply raw performance.</strong></p>
+<p><strong>Please note: the provided skeleton already handles
+input/output as required, but a description of the I/O protocol is
+provided below anyway.</strong></p>
+<p>You will implement a server in C++ that accepts the above commands
+from clients over Unix domain stream sockets. Your server application
+should accept a single argument, which is the path to the Unix domain
+socket to listen on i.e. it should be invoked like
+<code>./engine path/to/socket</code>.</p>
+<p>The server should be able to accept an unbounded number of
+connections, and an unbounded number of commands from each
+connection.</p>
+<p>Each input command will be of the format described by this C
+structure:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> input_type <span class="op">{</span> input_buy <span class="op">=</span> <span class="ch">&#39;B&#39;</span><span class="op">,</span> input_sell <span class="op">=</span> <span class="ch">&#39;S&#39;</span><span class="op">,</span> input_cancel <span class="op">=</span> <span class="ch">&#39;C&#39;</span> <span class="op">};</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> input <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">enum</span> input_type type<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> order_id<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// the following fields are present but ignored for a cancel command</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// i.e. all commands are the same size</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> price<span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">uint32_t</span> count<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// up to 8 chars + null terminator</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">char</span> instrument<span class="op">[</span><span class="dv">9</span><span class="op">];</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>In response to commands, actions should be written to the server’s
+standard output in the following format:</p>
+<ul>
+<li>Order added
+<ul>
+<li><code>&lt;Buy/Sell&gt; &lt;Order ID&gt; &lt;Instrument&gt; &lt;Price&gt; &lt;Count&gt; &lt;Timestamp received&gt; &lt;Timestamp completed&gt;</code></li>
+<li>The <code>Buy/Sell</code> field should be <code>B</code> if the
+order is a buy order, and <code>S</code> if it is a sell order.</li>
+<li>The <code>Timestamp received</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the
+<code>Order ID</code> was received by the server.</li>
+<li>The <code>Timestamp completed</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the
+<code>Order ID</code> has finished recording in the order book and this
+action was sent for printing.</li>
+<li>The timestamps should be used relative to each other, and they do
+not represent the absolute time. Using these timestamps you may compute
+the elapsed time for processing a command.</li>
+</ul></li>
+<li>Order executed
+<ul>
+<li><code>E &lt;Resting order ID&gt; &lt;New order ID&gt; &lt;Execution ID&gt; &lt;Price&gt; &lt;Count&gt; &lt;Timestamp received&gt; &lt;Timestamp completed&gt;</code></li>
+<li>The <code>Timestamp received</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the
+<code>New order ID</code> was received by the server.</li>
+<li>The <code>Timestamp completed</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the execution has
+finished and this action was sent for printing.</li>
+</ul></li>
+<li>Order deleted
+<ul>
+<li><code>X &lt;Order ID&gt; &lt;Accepted?&gt; &lt;Timestamp received&gt; &lt;Timestamp completed&gt;</code></li>
+<li>The <code>Accepted?</code> field should be <code>A</code> if the
+cancel is accepted, or <code>R</code> if the cancel is rejected.</li>
+<li>The <code>Timestamp received</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the cancel command was
+received by the server.</li>
+<li>The <code>Timestamp completed</code> is the monotonic clock
+(<code>CLOCK_MONOTONIC</code>) at the time when the cancel command was
+executed and this action was sent for printing.</li>
+</ul></li>
+</ul>
+<p>As mentioned earlier, the provided skeleton already implements the
+above I/O specification for you, with an implementation using normal
+synchronous I/O functions and one thread per connection, which is
+intended to be simple and to encourage a concurrent implementation that
+can achieve speedup via <em>parallelism</em> rather than simply by raw
+performance (such as by using asynchronous I/O, etc.). You are free to
+modify the I/O to suit your own needs while adhering to the protocol
+described above, with the restriction that <strong>each client
+connection must be handled on a unique thread</strong> (as is done by
+the provided I/O implementation).</p>
+<h2 data-number="1.3" id="provided-skeleton"><span class="header-section-number">1.3</span> Provided skeleton</h2>
+<p>The following files are provided.</p>
+<p>Files you will likely need to modify:</p>
+<ul>
+<li><code>engine.cpp</code>: An empty <code>Engine</code> implementation
+that creates a new thread when a connection is received, and then simply
+reads commands and dumps them to standard output. You will likely need
+to modify <code>Engine::ConnectionThread</code>.</li>
+<li><code>engine.hpp</code>: Declarations for <code>Engine</code>.</li>
+<li><code>Makefile</code>: GNU makefile. If you add any new source
+files, add them to the <code>SRCS</code> variable declaration on line
+9.</li>
+</ul>
+<p>Files you should not need to modify:</p>
+<ul>
+<li><code>io.cpp</code>: Provided I/O implementation, C++ part</li>
+<li><code>main.c</code>: Main function and provided I/O implementation,
+C part</li>
+<li><code>io.h</code>: Shared declarations for I/O</li>
+<li><code>client.c</code>: A client that reads commands from standard
+input in the format described below and sends them using the prescribed
+protocol to the server.</li>
+</ul>
+<p>To build, simply run <code>make</code>. You are free to change, add
+or remove any files as you wish. Make sure to update the
+<code>Makefile</code> if you do so, so that we are able to build your
+program.</p>
+<p>To run the engine, run e.g. <code>./engine socket</code>, as
+described above. The server will run and bind to the Unix domain socket
+at <code>./socket</code>. Then you can use the provided client to send
+commands to the engine, described next.</p>
+<h3 data-number="1.3.1" id="provided-client"><span class="header-section-number">1.3.1</span> Provided client</h3>
+<p>There is a provided client in <code>client.c</code>. To run it, run
+e.g. <code>./client socket</code>. The client will read commands from
+standard input in the following format:</p>
+<ul>
+<li>Create buy order
+<ul>
+<li><code>B &lt;Order ID&gt; &lt;Instrument&gt; &lt;Price&gt; &lt;Count&gt;</code></li>
+</ul></li>
+<li>Create sell order
+<ul>
+<li><code>S &lt;Order ID&gt; &lt;Instrument&gt; &lt;Price&gt; &lt;Count&gt;</code></li>
+</ul></li>
+<li>Cancel order
+<ul>
+<li><code>C &lt;Order ID&gt;</code></li>
+</ul></li>
+</ul>
+<p>There are some example input files <code>*.input</code> provided.</p>
+<p>You are encouraged to write your own clients that e.g. generate
+commands programmatically, etc., in order to test your implementation
+more thoroughly.</p>
+<h1 data-number="2" id="submission"><span class="header-section-number">2</span> Submission</h1>
+<p>Your program must be written in C++20. If you modify or write your
+own I/O, you can write that in C, but the actual engine/data
+structures/etc. must be in C++20. You may not use any libraries aside
+from the C++ standard library and POSIX libraries.</p>
+<p>Your program must work on the lab machines provided Parallel
+Computing Lab at COM1-B1-02, which are running Ubuntu 20.04. Check the
+<a href="#appendix">appendix</a> for further details about how to use
+the lab machines.</p>
+<p>With your submission, include a writeup as a PDF of up to two A4
+pages including the following:</p>
+<ul>
+<li>a description of your data structure(s) used to keep track of the
+orders. Explain how your data structures enable the concurrency.</li>
+<li>an explanation of how you support the concurrent execution of orders
+coming from multiple parallel clients. This description is essential for
+our grading, as such it should match your implementation and help us
+understand</li>
+<li>a description of how you tested your code with multiple clients and
+orders. Feel free to add any scripts or test case file(s) to your
+submission, under folder <code>scripts</code></li>
+</ul>
+<p>You are advised to work in groups of two students for this assignment
+(but you are allowed to work independently as well). You may discuss the
+assignment with others but in the case of plagiarism, both parties will
+be severely penalized. Cite your references or at least mention them in
+your report (what you referenced, where it came from, how much you
+referenced, etc.).</p>
+<p>Submit your assignment before the deadline under LumiNUS Files. Each
+group must submit ONE zip archive named with your student number(s)
+(<code>A0123456Z.zip</code> if you worked by yourself, or
+<code>A0123456Z_A0173456T.zip</code> if you worked with another student)
+containing the following files and folders.</p>
+<p>Your zip archive must contain <strong>only</strong> the
+following:</p>
+<ul>
+<li>all source and header files that comprise your program
+<ul>
+<li>Please include files from the skeleton that are required by your
+program, even if you do not modify them.</li>
+</ul></li>
+<li>a <code>Makefile</code> whose default target produces an
+<code>engine</code> binary conforming to the requirements described
+above
+<ul>
+<li>The provided <code>Makefile</code> conforms to this.</li>
+</ul></li>
+<li>the 2-page writeup as a PDF named <code>A0123456Z_report.pdf</code>
+or <code>A0123456Z_A0173456T_report.pdf</code></li>
+<li>an optional folder, named <code>scripts</code>, containing any
+additional scripts and testcases that you might have used for the
+assignment.</li>
+</ul>
+<p><strong>Do not</strong> include compiled binaries or object files in
+your submission archive.</p>
+<p>It is required to use a GitHub repository for your team. Access
+<strong>GitHub Classroom</strong> at this <a href="https://classroom.github.com/a/3pKevDE2">link</a> to create such a
+repository. Name your team <code>A0123456Z</code> (if you work by
+yourself) or <code>A0123456Z_A0173456T</code> (if you work with another
+student). We have enabled automatic checks for these repositories to
+ensure that we can compile and run your code after submission. You may
+check the status of these checks under Actions for your repository.
+Check the <a href="#github-classroom">appendix</a> for further details
+about GitHub Classroom.</p>
+<p>Submit your zip archive to the <strong>Assignment 1
+Submissions</strong> folder before <strong>Fri, 25 Feb,
+2pm</strong>.</p>
+<p><strong>All FAQs for this assignment will be answered <a href="https://docs.google.com/document/d/e/2PACX-1vRNTY2NXCxQLf_2LTMpvjx4JdEn1DqufPEPNWc_Ry1bRhyX-024zY3T7K0micWa97sToy4_qM58Aisg/pub">here</a>.
+If there are any questions you have that are not covered by the FAQ
+document, please post on the LumiNUS Forum.</strong></p>
+<p>Note that for submissions made as a group, only the most recent
+submission (from any of the students) will be graded, and both students
+receive that grade.</p>
+<p>A penalty of 5% per day (out of your grade) will be applied for late
+submissions.</p>
+<h1 data-number="3" id="appendix"><span class="header-section-number">3</span> Appendix</h1>
+<h2 data-number="3.1" id="accessing-the-lab-machines"><span class="header-section-number">3.1</span> Accessing the lab machines</h2>
+<p>Before using the SoC compute services (i.e. computer cluster nodes,
+login to Sunfire, etc), you <strong>should enable SoC Computer Cluster
+from your <a href="https://mysoc.nus.edu.sg/~myacct/services.cgi">MySoC
+Account page</a></strong>.</p>
+<p>To access the lab machines, ssh into
+<strong><em>Sunfire</em></strong> using the command below. Enter your
+<strong><em>SoC account and password</em></strong> when prompted.</p>
+<p><code>&gt; ssh your_soc_account_id@sunfire.comp.nus.edu.sg</code></p>
+<p>Next, from Sunfire, ssh into the lab machines using the command
+below. <strong><em>Enter your NUSNET id (e012…) and
+password</em></strong> published in LumiNUS Gradebook when prompted.</p>
+<p><code>&gt; ssh your_NUSNET_id@hostname</code> (#<code>hostname</code>
+might be <code>soctf-pdc-004.comp.nus.edu.sg</code>)</p>
+<p>Once entered, you should be looking at the shell of the remote lab
+machine, and you will be placed at the home directory of your
+account.</p>
+<p>Note that you should use your SoC account and password to access
+Sunfire, but use your NUSNET id and password published under LumiNUS
+Gradebook to login to the lab machines.</p>
+<p>To login without inputting a password, configure SSH key-based
+authentication. Use <code>ssh-keygen</code> and <code>ssh-copy-id</code>
+to copy the public key to the remote node.</p>
+<h2 data-number="3.2" id="list-of-machines"><span class="header-section-number">3.2</span> List of machines</h2>
+<ul>
+<li><code>soctf-pdc-001</code> - <code>soctf-pdc-008</code>: Xeon Silver
+4114 (10 cores, 20 threads)</li>
+<li><code>soctf-pdc-009</code> - <code>soctf-pdc-016</code>: Intel Core
+i7-7700 (4 cores, 8 threads)</li>
+<li><code>soctf-pdc-018</code> - <code>soctf-pdc-019</code>: Dual-socket
+Xeon Silver 4114 (2*10 cores, 40 threads)</li>
+<li><code>soctf-pdc-020</code> - <code>soctf-pdc-021</code>: Intel Core
+i7-9700 (8 cores, 8 threads)</li>
+<li><code>soctf-pdc-022</code> - <code>soctf-pdc-023</code>: Intel Xeon
+W-2245 (8 cores, 16 threads)</li>
+</ul>
+<p>Direct login is enabled to all lab machines, but some nodes are
+managed by Slurm Workload Manager. You can use Slurm to submit your
+batch jobs.</p>
+<ul>
+<li>Direct login (no Slurm)
+<ul>
+<li><code>soctf-pdc-001</code> - <code>soctf-pdc-004</code>,</li>
+<li><code>soctf-pdc-010</code> - <code>soctf-pdc-012</code>,</li>
+<li><code>soctf-pdc-018</code>,</li>
+<li><code>soctf-pdc-020</code>,</li>
+<li><code>soctf-pdc-022</code>,</li>
+<li><code>soctf-pdc-023</code></li>
+</ul></li>
+<li>Direct login, and managed with Slurm as well:
+<ul>
+<li><code>soctf-pdc-005</code> - <code>soctf-pdc-009</code>,</li>
+<li><code>soctf-pdc-013</code> - <code>soctf-pdc-016</code>,</li>
+<li><code>soctf-pdc-019</code>,</li>
+<li><code>soctf-pdc-021</code></li>
+</ul></li>
+</ul>
+<p>Updated Slurm guide can be found <a href="https://docs.google.com/document/d/e/2PACX-1vRJH_8IxBWW9tAaoOS0OdD9T9qAMr3J9lOc9nyMdFQwOC-Vm7I6QIzQP8cJ3B48CltS7nPyNyzsNeOC/pub">here</a>.</p>
+<p>To view the usage of the lab machines, you can use this Telegram bot:
+<code>@cs3210_machine_bot</code>. Simply type <code>/start</code> to get
+a real time status update for all machines.</p>
+<h2 data-number="3.3" id="github-classroom"><span class="header-section-number">3.3</span> GitHub Classroom</h2>
+<p>Visit the assignment <a href="https://classroom.github.com/a/3pKevDE2">link</a>.</p>
+<p>The first member of the team to access this link will be prompted to
+accept the assignment that gives your team access to the new repository.
+Create a new team by typing <code>A0123456Z</code> or
+<code>A0123456Z_A0173456T</code>, using the student numbers of the
+students forming a team. Note that the naming convention must be
+followed strictly, e.g. capitalisation, dash, and spacing. Use the same
+name for your LumiNUS submission for easy identification.</p>
+<p>The other member in the team will be able to see an existing team
+with your team id under “Join an existing team” section.</p>
+<p>The repository is automatically populated with the skeleton code
+provided for this assignment.</p>
+</body>
+</html>

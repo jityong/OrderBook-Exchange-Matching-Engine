@@ -1,0 +1,9 @@
+# IDEs
+/compile_commands.json
+/.cache
+/.idea
+
+# Build outputs
+grader
+*.o
+/.deps

@@ -1,0 +1,213 @@
+Got order: B TSLA x 15 @ 2800 ID: 101
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add creating new node
+B 101 TSLA 2800 15 36175337883 36175338148
+101
+Got order: B TSLA x 10 @ 2800 ID: 102
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+B 102 TSLA 2800 10 36175338174 36175338249
+102
+101
+Got order: B TSLA x 10 @ 2800 ID: 103
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+B 103 TSLA 2800 10 36175338275 36175338337
+103
+102
+101
+Got order: B TSLA x 10 @ 2800 ID: 104
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+B 104 TSLA 2800 10 36175338372 36175338430
+104
+103
+102
+101
+Got order: B TSLA x 15 @ 2800 ID: 105
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+B 105 TSLA 2800 15 36175338469 36175338525
+105
+104
+103
+102
+101
+Got order: B TSLA x 15 @ 2700 ID: 110
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add while loop looking for position to insert. order price: 2700 curr->next price: 2800
+in Buybook::add creating new node
+B 110 TSLA 2700 15 36175338571 36175338669
+110
+Got order: B TSLA x 10 @ 2700 ID: 111
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add while loop looking for position to insert. order price: 2700 curr->next price: 2800
+B 111 TSLA 2700 10 36175338692 36175338760
+111
+110
+Got order: B TSLA x 10 @ 2700 ID: 112
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add while loop looking for position to insert. order price: 2700 curr->next price: 2800
+B 112 TSLA 2700 10 36175338789 36175338854
+112
+111
+110
+Got order: B TSLA x 10 @ 2700 ID: 113
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add while loop looking for position to insert. order price: 2700 curr->next price: 2800
+B 113 TSLA 2700 10 36175338896 36175338969
+113
+112
+111
+110
+Got order: B TSLA x 15 @ 2700 ID: 114
+before process order switch stmt
+in buy order
+in process buy order
+To add resting order, lock buyBook head
+entered SellBook::matchOrder()
+entered BuyBook::add()
+in Buybook::add while loop looking for position to insert. order price: 2700 curr->next price: 2800
+B 114 TSLA 2700 15 36175339011 36175339085
+114
+113
+112
+111
+110
+Got cancel: ID: 101
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder, found equal price node
+X 101 A 36175337883 36175873467
+Got cancel: ID: 102
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder, found equal price node
+X 102 A 36175338174 36175873553
+Got cancel: ID: 103
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder, found equal price node
+X 103 A 36175338275 36175873631
+Got cancel: ID: 104
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder, found equal price node
+X 104 A 36175338372 36175873722
+Got cancel: ID: 105
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder, found equal price node
+X 105 A 36175338469 36175873799
+Got cancel: ID: 110
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder while loop
+In OrderBook::processCancelOrder, found equal price node
+X 110 A 36175338571 36175873890
+Got cancel: ID: 111
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder while loop
+In OrderBook::processCancelOrder, found equal price node
+X 111 A 36175338692 36175873971
+Got cancel: ID: 112
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder while loop
+In OrderBook::processCancelOrder, found equal price node
+X 112 A 36175338789 36175874050
+Got cancel: ID: 113
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder while loop
+In OrderBook::processCancelOrder, found equal price node
+X 113 A 36175338896 36175874130
+Got cancel: ID: 114
+before process order switch stmt
+in cancel order
+entered processCancelOrder()
+In OrderBook::processCancelOrder, acquired head lock
+In OrderBook::processCancelOrder, trying to acquire next lock
+In OrderBook::processCancelOrder, acquired next lock
+In OrderBook::processCancelOrder while loop
+In OrderBook::processCancelOrder, found equal price node
+X 114 A 36175339011 36175874225
+

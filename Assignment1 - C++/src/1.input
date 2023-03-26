@@ -1,0 +1,11 @@
+# line starting with # is ignored (comment)
+# blank lines ignored:
+
+# cancel order 123
+C 123
+
+# new buy order, id = 123, instrument GOOG, price 99999, count 11111
+B 123 GOOG 99999 11111
+
+# new sell order, id = 123, instrument GOOG, price 99999, count 11111
+S 123 GOOG 99999 11111

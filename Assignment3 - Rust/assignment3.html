@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Assignment 3: Task Runner in Rust</title>
+  <style>
+    :root{--b-font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;--b-font-mono: Consolas, Monaco, monospace;--b-txt: #2e3440;--b-bg-1: #fff;--b-bg-2: #eceff4;--b-line: #eceff4;--b-link: #bf616a;--b-btn-bg: #242933;--b-btn-txt: #fff;--b-focus: #88c0d0}*,::before,::after{box-sizing:border-box}html:focus-within{scroll-behavior:smooth}body{max-width:70ch;padding:0 1rem;margin:auto;background:var(--b-bg-1);font-family:var(--b-font-main);text-rendering:optimizeSpeed;line-height:1.5;color:var(--b-txt);-moz-tab-size:4;tab-size:4;word-break:break-word;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}h1,h2,h3,h4,h5,h6,p,ul,ol,dl,dd,details,blockquote,pre,figure,table,address,hr,fieldset,iframe,audio,video{margin:0 0 1.5rem}h1,h2,h3,h4,h5,h6{line-height:1.25;margin-top:2rem}h1{font-size:2rem}h2{font-size:1.5rem}h3{font-size:1.25rem}h4{font-size:1rem}h5{font-size:.875rem}h6{font-size:.75rem}a{color:var(--b-link);text-decoration:none}a:hover{text-decoration:underline}img,video,svg{max-width:100%;height:auto}embed,iframe,object{max-width:100%}iframe{border-style:none}abbr[title]{text-decoration:underline;text-decoration:underline dotted}blockquote{margin-left:0;padding:.5rem 0 .5rem 1.5rem;border-left:.25rem solid var(--b-txt)}blockquote>:last-child{margin-bottom:0}small{font-size:.875rem}sub,sup{font-size:.75em;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-0.25em}sup{top:-0.5em}hr{height:0;overflow:visible;border:0;border-bottom:1px solid var(--b-line)}pre,code,kbd,samp,tt,var{background:var(--b-bg-2);border-radius:.25rem;padding:.125rem .25rem;font-family:var(--b-font-mono);font-size:.875rem}pre{padding:1rem;border-radius:0;overflow:auto;white-space:pre}pre code{padding:0}details{display:block;padding:.5rem 1rem;background:var(--b-bg-2);border:1px solid var(--b-line);border-radius:.25rem}details>:last-child{margin-bottom:0}details[open]>summary{margin-bottom:1.5rem}summary{display:list-item;cursor:pointer;font-weight:bold}summary:focus{box-shadow:none}table{border-collapse:collapse;width:100%;text-indent:0}table caption{margin-bottom:.5rem}tr{border-bottom:1px solid var(--b-line)}td,th{padding:.5rem 0}th{text-align:left}ul,ol,dd{padding-left:2rem}li>ul,li>ol{margin-bottom:0}fieldset{padding:.5rem .75rem;border:1px solid var(--b-line);border-radius:.25rem}legend{padding:0 .25rem}label{cursor:pointer;display:block;margin-bottom:.25rem}button,input,select,textarea{margin:0;padding:.5rem .75rem;max-width:100%;background:var(--b-bg-2);border:0;border-radius:.25rem;font:inherit;line-height:1.125;color:var(--b-txt)}select,input:not([size]):not([type=button i]):not([type=submit i]):not([type=reset i]):not([type=checkbox i]):not([type=radio i]){width:100%}[type=color i]{min-height:2.125rem}select:not([multiple]):not([size]){padding-right:1.5rem;background-repeat:no-repeat;background-position:right .5rem center;-moz-appearance:none;-webkit-appearance:none;appearance:none}textarea{width:100%;resize:vertical}textarea:not([rows]){height:8rem}button,[type=button i],[type=submit i],[type=reset i]{-webkit-appearance:button;display:inline-block;text-align:center;white-space:nowrap;background:var(--b-btn-bg);color:var(--b-btn-txt);border:0;cursor:pointer;transition:opacity .25s}button:hover,[type=button i]:hover,[type=submit i]:hover,[type=reset i]:hover{opacity:.75}button[disabled],[type=button i][disabled],[type=submit i][disabled],[type=reset i][disabled]{opacity:.5}progress{vertical-align:middle}[type=search i]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}::-webkit-input-placeholder{color:inherit;opacity:.5}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}::-moz-focus-inner{border-style:none;padding:0}:-moz-focusring{outline:1px dotted ButtonText}:-moz-ui-invalid{box-shadow:none}[aria-busy=true i]{cursor:progress}[aria-controls]{cursor:pointer}[aria-disabled=true i],[disabled]{cursor:not-allowed}:focus,details:focus-within{outline:none;box-shadow:0 0 0 2px var(--b-focus)}@media(prefers-reduced-motion: reduce){html:focus-within{scroll-behavior:auto}*,::before,::after{animation-delay:-1ms !important;animation-duration:1ms !important;animation-iteration-count:1 !important;background-attachment:initial !important;scroll-behavior:auto !important;transition-delay:0 !important;transition-duration:0 !important}}select:not([multiple]):not([size]){background-image:url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%232e3440'%3E%3Cpath d='M5 6l5 5 5-5 2 1-7 7-7-7 2-1z'/%3E%3C/svg%3E")}
+    body {
+      /* bamboo is too thin */
+      max-width: 80ch;
+    }
+    /* Add styling for captions, mainly to go under code blocks */
+    figcaption {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.header-section-number {
+      margin-right: 0.5em;
+    }
+    span.toc-section-number {
+      margin-right: 0.3em;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Assignment 3: Task Runner in Rust</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#task-runner"><span class="toc-section-number">1</span>
+Task runner</a>
+<ul>
+<li><a href="#task-runner-parameters"><span class="toc-section-number">1.1</span> Task runner parameters</a></li>
+<li><a href="#tasks-and-task-input-and-output"><span class="toc-section-number">1.2</span> Tasks, and task input and
+output</a></li>
+<li><a href="#task-runner-output"><span class="toc-section-number">1.3</span> Task runner output</a></li>
+<li><a href="#provided-base"><span class="toc-section-number">1.4</span>
+Provided base</a></li>
+<li><a href="#sample-runs"><span class="toc-section-number">1.5</span>
+Sample runs</a></li>
+</ul></li>
+<li><a href="#bonus-memory-usage-requirements"><span class="toc-section-number">2</span> Bonus <mark>memory usage
+requirements</mark></a></li>
+<li><a href="#submission"><span class="toc-section-number">3</span>
+Submission</a>
+<ul>
+<li><a href="#report"><span class="toc-section-number">3.1</span>
+Report</a></li>
+<li><a href="#deliverables"><span class="toc-section-number">3.2</span>
+Deliverables</a></li>
+</ul></li>
+<li><a href="#appendix"><span class="toc-section-number">4</span>
+Appendix</a>
+<ul>
+<li><a href="#accessing-the-lab-machines"><span class="toc-section-number">4.1</span> Accessing the lab
+machines</a></li>
+<li><a href="#list-of-machines"><span class="toc-section-number">4.2</span> List of machines</a></li>
+<li><a href="#github-classroom"><span class="toc-section-number">4.3</span> GitHub Classroom</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>In this assignment, you will implement a concurrent task runner that
+executes a set of independent tasks, in Rust.</p>
+<h1 data-number="1" id="task-runner"><span class="header-section-number">1</span> Task runner</h1>
+<p>A task runner is a program that schedules and executes tasks. For
+simplicity, there are only three types of tasks, which are detailed in
+<a href="#tasks-and-task-input-and-output">Tasks, and task input and
+output</a>. Note that the implementation of the tasks are provided and
+should not be modified; the focus of the assignment is to execute tasks
+concurrently, and not to parallelise the computation within a task.</p>
+<p>For this assignment, a set of initial tasks is generated from an
+initial seed. Each task may produce a number of further tasks to be
+executed. The output of all tasks is combined to produce a single output
+value at the end. For simplicity, the output is combined in a manner
+that is independent of order.</p>
+<p>The goal of the assignment is to implement this task runner to allow
+for concurrent execution of tasks when running on a single computer. Try
+also to maximise the task throughput (i.e. number of tasks completed per
+unit time); this is not, however, the aim of the assignment.</p>
+<p>The task runner must execute the tasks generated at the beginning of
+the execution, and those generated after the execution of initial tasks.
+The runner is allowed to use any approach for starting tasks, and for
+collecting the newly generated tasks. The runner, written in Rust,
+should execute tasks concurrently when possible. There are several
+possible approaches that you might use to structure your program:</p>
+<ul>
+<li>Use worker threads that are coordinated by a master that keeps track
+of tasks that must be executed.</li>
+<li>Use a shared task pool with no explicitly designated master
+thread.</li>
+<li>Use a decentralized approach where all worker threads are allowed to
+issue tasks to other threads and execute tasks assigned to them.</li>
+<li>Use asynchronous programming to run the tasks.</li>
+</ul>
+<p>Regardless of the method used to make the runner concurrent, the
+final output should remain the same.</p>
+<h2 data-number="1.1" id="task-runner-parameters"><span class="header-section-number">1.1</span> Task runner parameters</h2>
+<p>The task runner takes three parameters:</p>
+<ul>
+<li>initial seed: this is used to generate the initial task set, which
+has between 0 and 64 tasks</li>
+<li>initial height: the height of the tasks in the initial task set;
+child tasks get a height one less than their parent task’s height, and a
+task with height 0 will generate no further tasks</li>
+<li>max. children: the maximum number of child tasks that result from
+each task</li>
+</ul>
+<p>The runner should accept arguments from the command line in the
+format
+<code>&lt;initial seed&gt; &lt;initial height&gt; &lt;max. children&gt;</code>.
+This has been handled for you in the provided sequential implementation,
+and there is no need to change this.</p>
+<h2 data-number="1.2" id="tasks-and-task-input-and-output"><span class="header-section-number">1.2</span> Tasks, and task input and
+output</h2>
+<p>Note, again, that the implementations of the tasks are provided in
+<code>task.rs</code>, and you should not modify them.</p>
+<p>Tasks take both as input and output a single <code>u64</code>. The
+input <code>u64</code> is used to seed each task’s individual RNG
+instance, used to generate task parameters. The output <code>u64</code>
+is XORed with the input <code>u64</code> and then used as a seed to
+generate child tasks.</p>
+<p>There are three types of tasks:</p>
+<ul>
+<li>Hash: generate 32 bytes, then repeatedly SHA256 hash the 32 bytes a
+random number of times, with the output of each hash iteration being the
+input of the next iteration. The output <code>u64</code> is taken from a
+random 8-byte slice of the final hash output.</li>
+<li>Derive: generate a 32-byte secret and 32-byte salt, then run the
+PBKDF2 key derivation function for a random number of iterations to
+generate a 64-byte key. The output <code>u64</code> is taken from a
+random 8-byte slice of the final key output.</li>
+<li>Random: the RNG is sampled a random number of times, and the last
+sample is returned as the result.</li>
+</ul>
+<h2 data-number="1.3" id="task-runner-output"><span class="header-section-number">1.3</span> Task runner output</h2>
+<p>The task runner should print to standard output, on a single
+line:</p>
+<pre><code>&lt;combined output&gt;,&lt;number of Hash tasks&gt;,&lt;number of Derive tasks&gt;,&lt;number of Random tasks&gt;</code></pre>
+<p>An example of printing the output is provided in the provided
+sequential implementation.</p>
+<p>The combined output is the XOR of all task outputs. XOR is both
+commutative and associative; keep this in mind when you decide how to
+combine task outputs from concurrently executed tasks.</p>
+<p>The output of your concurrent runner should remain the same as the
+sequential implementation.</p>
+<p><strong>No other output should be printed to standard output. If you
+wish to print debugging output, print to standard error using
+<code>eprintln!</code>.</strong></p>
+<h2 data-number="1.4" id="provided-base"><span class="header-section-number">1.4</span> Provided base</h2>
+<p>As a base, a sequential implementation of the task runner is
+provided.</p>
+<ul>
+<li><code>src/main.rs</code>: Crate entry point, and sequential runner
+implementation.</li>
+<li><code>src/task.rs</code>: Task generation and execution. <strong>Do
+not change this file. We may replace this file in grading.</strong></li>
+<li><code>Cargo.toml</code>: Cargo project file.</li>
+<li><code>Cargo.lock</code>: Cargo lock file.</li>
+</ul>
+<p>To build, simply run <code>cargo build</code>. You should specify the
+<code>-r</code> flag when testing performance, so that compiler
+optimisations are enabled. You are free to change, add or remove any
+files as needed, except for <code>src/task.rs</code>. When you add new
+source files, you need to declare them in <code>main.rs</code> (or the
+relevant parent module). Read the <a href="https://doc.rust-lang.org/book/ch07-05-separating-modules-into-different-files.html">documentation</a>
+on Rust’s module system for more information.</p>
+<p>To run, you can use <code>cargo run</code> (with <code>-r</code>, as
+needed), or execute the binary directly at
+<code>target/{debug,release}/taskrunner</code>. As explained above, the
+task runner should accept arguments on the command line.</p>
+<p>You are allowed to add and use additional crates that are approved by
+the teaching team. The list of approved crates can be found in the
+assignment FAQ, which is linked at the end of the document. If you wish
+to use any other crates, please request for approval via the forum
+thread linked in the FAQ.</p>
+<h2 data-number="1.5" id="sample-runs"><span class="header-section-number">1.5</span> Sample runs</h2>
+<p>Here are three sample runs. You should receive the same output when
+running using the same arguments locally.</p>
+<pre><code>$ cargo run -r 5664168989938163334
+Using seed 5664168989938163334, starting height 5, max. children 5
+Completed in 58.200392774 s
+8229144459996529628,825,876,874
+
+$ cargo run -r 1976915708242608314
+Using seed 1976915708242608314, starting height 5, max. children 5
+Completed in 80.852794384 s
+8889898106685444821,1173,1215,1173
+
+$ cargo run -r 12605174704058567923
+Using seed 12605174704058567923, starting height 5, max. children 5
+Completed in 41.325396062 s
+12607843883509729997,623,618,649</code></pre>
+<h1 data-number="2" id="bonus-memory-usage-requirements"><span class="header-section-number">2</span> Bonus <mark>memory usage
+requirements</mark></h1>
+<p>Certain task scheduling algorithms may cause memory usage to increase
+exponentially in the size of the input parameters
+<code>max. children</code> and <code>initial height</code>. (Note: the
+sequential runner in the skeleton code consumes an exponential amount of
+memory.)</p>
+<p>We expect your assignment to handle maximum
+<code>&lt;max. children&gt;^&lt;initial height&gt;</code> below
+<code>1,000,000</code> <mark>while staying under 4GB of memory usage.
+Most implementations (even inefficient) will automatically fulfil this
+requirement. There is no requirement on the runtime of your program, as
+this is dependent on the tasks being run.</mark></p>
+<p>However, you can obtain up to <strong>2 bonus marks</strong> if your
+implementation can handle up to <code>10,000</code> for each of the
+values <code>&lt;initial height&gt;</code> and
+<code>&lt;max. children&gt;</code> <mark>while staying under 4GB of
+memory usage. Once again, there is no requirement on the runtime of your
+program; it is allowed to take longer than the heat death of the
+universe as long as your program runs in finite time.</mark> Use a
+separate folder called <code>bonus</code> to submit your attempt for
+bonus marks. You are allowed to modify <code>task.rs</code>, but the
+output should stay the same as the sequential version.</p>
+<h1 data-number="3" id="submission"><span class="header-section-number">3</span> Submission</h1>
+<p>This assignment is worth 10% of your CS3211 grade (about 8%
+implementation and 2% report). Late submissions are accepted with a
+penalty of 5% of your assignment grade per day.</p>
+<h2 data-number="3.1" id="report"><span class="header-section-number">3.1</span> Report</h2>
+<p>With your submission, include a writeup as a PDF of up to four A4
+pages including the following:</p>
+<ul>
+<li>An outline and brief explanation of your task runner — include all
+assumptions, as well as any non-trivial implementation details</li>
+<li>Explain the main method used in your concurrent implementation.</li>
+<li>Explain how the concurrency is achieved in your implementation.</li>
+<li>Will your implementation run in parallel? If yes, explain why?</li>
+<li>In case you have tried multiple implementations, explain the
+differences and your evolution to the current submission. There is no
+need to submit your alternative implementations.</li>
+</ul>
+<h2 data-number="3.2" id="deliverables"><span class="header-section-number">3.2</span> Deliverables</h2>
+<p>You are advised to work in groups of two students for this assignment
+(but you are allowed to work independently as well). You may discuss the
+assignment with others but in the case of plagiarism, both parties will
+be severely penalized. Cite your references or at least mention them in
+your report (what you referenced, where it came from, how much you
+referenced, etc.).</p>
+<p>Submit your assignment before the deadline under LumiNUS Files. Each
+group must submit ONE zip archive named with your student number(s)
+(<code>A0123456Z.zip</code> if you worked by yourself, or
+<code>A0123456Z_A0173456T.zip</code> if you worked with another student)
+containing the following files and folders.</p>
+<p>Your zip archive must contain <strong>only</strong> the
+following:</p>
+<ul>
+<li>all Rust source files, under the <code>src/</code> folder
+<ul>
+<li>Please include files from the provided implementation that are
+required by your program, even if you do not modify them.</li>
+</ul></li>
+<li><code>Cargo.toml</code> and <code>Cargo.lock</code> file.</li>
+<li>the report as a PDF named <code>A0123456Z_report.pdf</code> or
+<code>A0123456Z_A0173456T_report.pdf</code></li>
+<li>an optional <code>bonus</code> folder containing your attempt for
+the bonus; if your solution for bonus is the same as the basic solution,
+copy the implementation within this <code>bonus</code> folder.</li>
+</ul>
+<p><strong>Do not</strong> include compiled binaries or object files in
+your submission archive.</p>
+<p>Note that for group submissions, only the <strong>most recent
+submission</strong> (from any group member) will be graded, and both
+students receive the same grade.</p>
+<p>It is required to use a GitHub repository for your team. Access
+<strong>GitHub Classroom</strong> at this <a href="https://classroom.github.com/a/P4kDWw-r">link</a> to create such a
+repository. Name your team <code>A3-A0123456Z</code> (if you work by
+yourself) or <code>A3-A0123456Z_A0173456T</code> (if you work with
+another student). <strong>(Note the <code>A3</code> prefix; this is
+needed to avoid clashes with teams from previous assignments.)</strong>
+We have enabled automatic checks for these repositories to ensure that
+we can compile and run your code after submission. You may check the
+status of these checks under Actions for your repository. Check the <a href="#github-classroom">appendix</a> for further details about GitHub
+Classroom.</p>
+<p>Submit your zip archive to the <strong>Assignment 3
+Submissions</strong> folder before <strong>Mon, 18 Apr,
+8pm</strong>.</p>
+<p><strong>All FAQs for this assignment will be answered <a href="https://docs.google.com/document/d/e/2PACX-1vRSqI5A81ecR2uWOmsxSligi8lgrbwJFq-RStvmSrSWNEyVR32n5n76_e0cYTFWppWjF78HoIfSx4iz/pub">here</a>.
+The list of approved crates is also in this document. If there are any
+questions you have that are not covered by the FAQ document, please post
+on the LumiNUS Forum.</strong></p>
+<h1 data-number="4" id="appendix"><span class="header-section-number">4</span> Appendix</h1>
+<h2 data-number="4.1" id="accessing-the-lab-machines"><span class="header-section-number">4.1</span> Accessing the lab machines</h2>
+<p>Before using the SoC compute services (i.e. computer cluster nodes,
+login to Sunfire, etc), you <strong>should enable SoC Computer Cluster
+from your <a href="https://mysoc.nus.edu.sg/~myacct/services.cgi">MySoC
+Account page</a></strong>.</p>
+<p>To access the lab machines, ssh into
+<strong><em>Sunfire</em></strong> using the command below. Enter your
+<strong><em>SoC account and password</em></strong> when prompted.</p>
+<p><code>&gt; ssh your_soc_account_id@sunfire.comp.nus.edu.sg</code></p>
+<p>Next, from Sunfire, ssh into the lab machines using the command
+below. <strong><em>Enter your NUSNET id (e012…) and
+password</em></strong> published in LumiNUS Gradebook when prompted.</p>
+<p><code>&gt; ssh your_NUSNET_id@hostname</code> (#<code>hostname</code>
+might be <code>soctf-pdc-004.comp.nus.edu.sg</code>)</p>
+<p>Once entered, you should be looking at the shell of the remote lab
+machine, and you will be placed at the home directory of your
+account.</p>
+<p>Note that you should use your SoC account and password to access
+Sunfire, but use your NUSNET id and password published under LumiNUS
+Gradebook to login to the lab machines.</p>
+<p>To login without inputting a password, configure SSH key-based
+authentication. Use <code>ssh-keygen</code> and <code>ssh-copy-id</code>
+to copy the public key to the remote node.</p>
+<h2 data-number="4.2" id="list-of-machines"><span class="header-section-number">4.2</span> List of machines</h2>
+<ul>
+<li><code>soctf-pdc-001</code> - <code>soctf-pdc-008</code>: Xeon Silver
+4114 (10 cores, 20 threads)</li>
+<li><code>soctf-pdc-009</code> - <code>soctf-pdc-016</code>: Intel Core
+i7-7700 (4 cores, 8 threads)</li>
+<li><code>soctf-pdc-018</code> - <code>soctf-pdc-019</code>: Dual-socket
+Xeon Silver 4114 (2*10 cores, 40 threads)</li>
+<li><code>soctf-pdc-020</code> - <code>soctf-pdc-021</code>: Intel Core
+i7-9700 (8 cores, 8 threads)</li>
+<li><code>soctf-pdc-022</code> - <code>soctf-pdc-023</code>: Intel Xeon
+W-2245 (8 cores, 16 threads)</li>
+</ul>
+<p>Direct login is enabled to all lab machines, but some nodes are
+managed by Slurm Workload Manager. You can use Slurm to submit your
+batch jobs.</p>
+<ul>
+<li>Direct login (no Slurm)
+<ul>
+<li><code>soctf-pdc-001</code> - <code>soctf-pdc-004</code>,</li>
+<li><code>soctf-pdc-010</code> - <code>soctf-pdc-012</code>,</li>
+<li><code>soctf-pdc-018</code>,</li>
+<li><code>soctf-pdc-020</code>,</li>
+<li><code>soctf-pdc-022</code>,</li>
+<li><code>soctf-pdc-023</code></li>
+</ul></li>
+<li>Direct login, and managed with Slurm as well:
+<ul>
+<li><code>soctf-pdc-005</code> - <code>soctf-pdc-009</code>,</li>
+<li><code>soctf-pdc-013</code> - <code>soctf-pdc-016</code>,</li>
+<li><code>soctf-pdc-019</code>,</li>
+<li><code>soctf-pdc-021</code></li>
+</ul></li>
+</ul>
+<p>Use <code>rustup</code> to start using Rust on the lab machines.</p>
+<p>Updated Slurm guide can be found <a href="https://docs.google.com/document/d/e/2PACX-1vRJH_8IxBWW9tAaoOS0OdD9T9qAMr3J9lOc9nyMdFQwOC-Vm7I6QIzQP8cJ3B48CltS7nPyNyzsNeOC/pub">here</a>.</p>
+<p>To view the usage of the lab machines, you can use this Telegram bot:
+<code>@cs3210_machine_bot</code>. Simply type <code>/start</code> to get
+a real time status update for all machines.</p>
+<h2 data-number="4.3" id="github-classroom"><span class="header-section-number">4.3</span> GitHub Classroom</h2>
+<p>Visit the assignment <a href="https://classroom.github.com/a/P4kDWw-r">link</a>.</p>
+<p>The first member of the team to access this link will be prompted to
+accept the assignment that gives your team access to the new repository.
+Create a new team by typing <code>A3-A0123456Z</code> or
+<code>A3-A0123456Z_A0173456T</code>, using the student numbers of the
+students forming a team. Note that the naming convention must be
+followed strictly, e.g. capitalisation, dash, and spacing. Use the same
+name for your LumiNUS submission for easy identification.</p>
+<p>The other member in the team will be able to see an existing team
+with your team ID under “Join an existing team” section.</p>
+<p>The repository is automatically populated with the skeleton code
+provided for this assignment.</p>
+</body>
+</html>

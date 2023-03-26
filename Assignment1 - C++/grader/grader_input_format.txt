@@ -1,0 +1,44 @@
+# lines starting with # are ignored
+# blank lines are ignored
+
+# at the start of the testcase, specify the number of client threads to create
+10
+# each thread has an ID, assigned sequentially from 0
+
+# all commands can be prefixed by thread ID
+# specify IDs like:
+# - single ID: 0
+# - comma-separated: 0,1
+# - range (incl on both ends): 0-2
+# - combination: 0,2,4-7
+# if not prefixed, then all threads will execute the command
+
+# note: commands are NOT executed in lockstep
+# this input sequence is parsed into separate input streams for each thread
+
+# sync all threads (barrier)
+.
+
+# sync threads 0, 1, 7, 8 and 9
+0,1,7-9 .
+
+# thread 0 connect to server (open)
+0 o
+
+# disconnect
+0 x
+
+# sleep (ms)
+0 s 1000
+
+# send command
+# same syntax as our client
+# id = 123, symbol = GOOG, price 99999, count 11111
+0 C 123
+0 B 123 GOOG 99999 11111
+0 S 123 GOOG 99999 11111
+# note: because buy/sell need a unique order ID and because of the restriction on cancel (same client)
+# it does not make sense to have more than one thread execute the same command
+
+# wait for an active order to be either fully matched (without going onto the book) or put onto the book
+0 w 123
